@@ -10,19 +10,19 @@ class MyAutoencoder(nn.Module):
         super().__init__()
 
         self.encoder = nn.Sequential(
-            nn.Conv2d(3, 12, 3, stride=2, padding=1),
+            nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=1),
             nn.LeakyReLU(),
-            nn.Conv2d(12, 4, 3, stride=2, padding=1),
+
+            nn.Conv2d(64, 4, kernel_size=3, stride=2, padding=1),
             nn.LeakyReLU()
             )
-        
-        self.code = None
 
         self.decoder = nn.Sequential(
-            nn.ConvTranspose2d(4, 12, 3, stride=2, padding=1, output_padding=1),
+            nn.ConvTranspose2d(4, 64, 3, stride=2, padding=1, output_padding=1),
             nn.LeakyReLU(),
-            nn.ConvTranspose2d(12, 3, 3, stride=2, padding=1, output_padding=1),
-            nn.Sigmoid()
+
+            nn.ConvTranspose2d(64, 3, 3, stride=1, padding=1),
+            nn.LeakyReLU(),
         )
 
     def forward(self, x):
