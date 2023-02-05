@@ -1,6 +1,7 @@
 **/__pycache__
 **/.DS_Store
 data/*
-outputs/*
+notebooks/outputs/*
+notebooks/runs/*
 .vscode/*
 miltask.egg-info
