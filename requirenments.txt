@@ -1,0 +1,7 @@
+ipykernel==6.20.2
+ipython==8.9.0
+matplotlib==3.6.3
+tensorboard==2.11.2
+torch==1.13.1
+torchvision==0.14.1
+torchmetrics=0.11.1

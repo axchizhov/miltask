@@ -1,6 +1,7 @@
 import torch
 import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.ticker as ticker
 
 from torchvision.utils import make_grid
 from itertools import chain
@@ -32,12 +33,6 @@ def grid_plot(images: torch.Tensor, reconstructed: torch.Tensor):
 
     return grid
 
-
-
-
-
-import matplotlib.pyplot as plt
-import matplotlib.ticker as ticker
 
 def vis_confusion(writer, tag, step, matrix: torch.Tensor, class_dict):
     """
@@ -81,28 +76,3 @@ def vis_confusion(writer, tag, step, matrix: torch.Tensor, class_dict):
     plt.tight_layout()
 
     writer.add_figure(f"Confusion matrix: {tag}", fig, step)
-
-
-if __name__ == '__main__':
-    labels = torch.Tensor([7, 3, 4, 6, 5, 9, 0, 8, 4, 9, 3, 4, 2, 9, 4, 4])
-    y_pred = torch.Tensor([7, 6, 6, 6, 4, 8, 0, 8, 6, 9, 1, 0, 3, 9, 1, 4])
-
-    import torchmetrics
-    from utils import vis_confusion 
-
-    classes = ('plane', 'car', 'bird', 'cat', 'deer',
-           'dog', 'frog', 'horse', 'ship', 'truck')
-
-    classes = {label: i for i, label in enumerate(classes)}
-
-
-    matrix = torchmetrics.ConfusionMatrix('multiclass', num_classes=10)
-
-    matrix = matrix(y_pred, labels).numpy()
-
-    
-    from torch.utils.tensorboard import SummaryWriter
-    tb = SummaryWriter()
-
-    vis_confusion(tb, 1, matrix, classes)
-
