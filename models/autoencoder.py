@@ -1,10 +1,11 @@
 import torch
 import torchvision
+import torch.nn.functional as F
 
 from torch import nn
 
 
-class Autoencoder(nn.Module):
+class MyAutoencoder(nn.Module):
     def __init__(self):
         super().__init__()
 
@@ -29,22 +30,3 @@ class Autoencoder(nn.Module):
         decoded = self.decoder(coded)
 
         return decoded
-
-
-class Classifier(nn.Module):
-    def __init__(self):
-        super().__init__()
-
-        self.clf = nn.Sequential(
-            nn.Linear(256, 128),
-            nn.ReLU(),
-            nn.Linear(128, 64),
-            nn.ReLU(),
-            nn.Linear(64, 10),
-        )
-
-    def forward(self, x):
-        x = self.clf(x)
-        
-        return x
-
