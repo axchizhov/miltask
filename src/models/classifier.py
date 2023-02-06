@@ -3,22 +3,44 @@ import torch.nn.functional as F
 import torchmetrics
 
 from pytorch_lightning import LightningModule
+from torch import nn
 
+from src.models.autoencoder import MyAutoencoder
 from src.utils import vis_confusion
 
 
+AUTOENCODER_WEIGHTS = 'models/autoencoder_without_love.pth'
+CLASSIFIER_WEIGHTS = 'models/clf_model.pth'
+LR = 1e-3
+
+CLASSESS = {'plane': 0, 'car': 1, 'bird': 2, 'cat': 3, 'deer': 4,
+            'dog': 5, 'frog': 6, 'horse': 7, 'ship': 8, 'truck': 9}
+
+
 class MyClassifier(LightningModule):
-    def __init__(self, autoencoder, classifier, classes, lr):
+    def __init__(self):
         super().__init__()
 
-        self._autoencoder = autoencoder
+        self._autoencoder = MyAutoencoder()
+        self._autoencoder.load_state_dict(torch.load(AUTOENCODER_WEIGHTS))
+
         self._autoencoder.requires_grad_(False)
         self.encoder = self._autoencoder.encoder
 
-        self.clf = classifier
+        self.clf = nn.Sequential(
+            nn.Linear(1024, 128),
+            nn.BatchNorm1d(128),
+            nn.ReLU(),
 
-        self.classes = classes
-        self.lr = lr
+            nn.Linear(128, 256),
+            nn.BatchNorm1d(256),
+            nn.ReLU(),
+
+            nn.Linear(256, 10)
+            )
+
+        self.classes = CLASSESS
+        self.lr = LR
 
         # Quality metrics
         self.accuracy = torchmetrics.Accuracy('multiclass', num_classes=len(self.classes))

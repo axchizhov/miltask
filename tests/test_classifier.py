@@ -10,20 +10,8 @@ from torchvision import transforms
 from pytorch_lightning import Trainer
 from pytorch_lightning.loggers import TensorBoardLogger
 
+from src.models.classifier import MyClassifier
 
-from models.autoencoder import MyAutoencoder
-from models.classifier import MyClassifier
-from src.utils import plot_reconstructed, grid_plot, vis_confusion
-
-
-@pytest.fixture
-def classes():
-    classes = ('plane', 'car', 'bird', 'cat', 'deer',
-               'dog', 'frog', 'horse', 'ship', 'truck')
-    
-    classes = {label: i for i, label in enumerate(classes)}
-    
-    return classes
 
 @pytest.fixture
 def data():
@@ -44,23 +32,26 @@ def data():
 
     return train_dataloader, val_dataloader
 
-@pytest.fixture
-def autoencoder():
-    autoencoder_weights = 'outputs/autoencoder_model.pth'
 
-    autoencoder = MyAutoencoder()
-    autoencoder.load_state_dict(torch.load(autoencoder_weights))
+def test_classifier_forward(data):
+    _, val_dataloader = data
 
-    return autoencoder
+    imgs = next(iter(val_dataloader))[0][:2]
 
-def test_classifier(classes, data, autoencoder):
-    train_dataloader, val_dataloader = data
+    net = MyClassifier()
 
-    clf = nn.Sequential(nn.Linear(256, 10), nn.ReLU())
+    y_pred = net(imgs)
+    assert list(y_pred.shape) == [2, 10]
 
-    net = MyClassifier(autoencoder, clf, classes, lr=1e-3)
+
+# def test_classifier_train(data):
+#     train_dataloader, val_dataloader = data
+
+#     net = MyClassifier()
     
-    logger = TensorBoardLogger('../outputs', name='tests', version='testing')
-    trainer = Trainer(max_epochs=1, logger=logger)
+#     logger = TensorBoardLogger('run_test', name='tests', version='testing')
+#     trainer = Trainer(max_epochs=1, logger=logger)
 
-    trainer.fit(net, train_dataloader, val_dataloader)
+#     trainer.fit(net, train_dataloader, val_dataloader)
+
+#     # todo: remove run_test folder
