@@ -118,6 +118,11 @@ pip install -r requirements.txt
 pip install -e .
 ```
 
+Для тестов:
+```
+pip install pytest
+```
+
 ### Структура репозитория
 
 * data → данные для обучения
