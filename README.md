@@ -45,6 +45,8 @@ Batch MSE (log scale)
 
 Реализовал простейшую нейронную сеть из нескольких полносвязных слоев.
 
+![clf](resources/clf_model.png)
+
 ### Пайплайн
 
 Тестовый датасет разбил на три части: 
@@ -57,52 +59,58 @@ Batch MSE (log scale)
 
 Классы в датасете сбалансированы, а это значит, что можно без проблем смотреть на долю правильных ответов (Accuracy). Дополнительно я еще посматривал на матрицу ошибок, она довольно наглядная.
 
+Итоговые результаты моего классификатора:
+1. На train 
+2. На val
+3. На test
 
-Теперь к цифрам. Текущий расклад по качеству такой: https://paperswithcode.com/sota/image-classification-on-cifar-10
+А в мире, вообще-то так: https://paperswithcode.com/sota/image-classification-on-cifar-10
 ![clf_sota](resources/clf_sota.png)
 
-Лучший результат в мире — 99.5%. 
-В этом тестовом задании, наверное, реально получить 85-95%.
-Моя нетюнингованная модель: 47%
-![classifier_quality](resources/classifier_quality.png)
+Лучший результат — 99.5%. Я даже не уверен, что своими глазами столько на этом датасете смогу выжать %)
+
 
 ## Выводы (ака следующие шаги)
 
-Модель плохая, что же делать? По-хорошему, надо проводить анализиз ошибок на train/val/test датасетах. Там выясниться, в какую сторону стоит дальше копать.
+Модель получилось не очень, что дальше?
 
-Скорее всего, помочь может что-то из списка ниже.
+На графиках видно, что  сильно переобучается (train loss << val loss), причем за 10 эпох это хорошо становится видно. 
 
-#### Улучшить автоенкодер
+![clf loss](resources/clf_loss.png)
+![clf quality](resources/clf_accuracy.png)
+![clf matrix](resources/clf_conf_matrix.png)
 
-* Попробовать другие архитектуры
-	* fully-connected layers
-	* batchnorm
-	* maxpooling
-- Нормализовать входные данные
-	- (почему-то во всех туториалах cifar10 нормализуют неправильно)
-- Попробовать регуляризацию
-- Попробовать аугументацию датасета
-- Обучать дольше
 
-В принципе, подготовленная инфраструктура позволяет это все достаточно просто сделать.
+Дальше надо копать туда:
+- добавить данных с помощью аугументаций
+— включил бы регуляризацию
+— поковырять автоэнкодер бы не помешало
+— плюс можно пойти почитать, что в топовых моделях напридумывали
 
-#### Улучшить классификатор
-- На удачу, не вникая и не тратя много особо времени
-	- Попробовать несколько fully-connected layers
-	- Попробовать выдавать из автоэнкодера unflatten представление
-- Посмотреть, что делают топовые модели
-- Ну и начать проводить анализ ошибок на train/val/test датасете (чтобы улучшать выбраную модель)
-- И здесь аугументацию датасета попробовать
-- Обучать дольше тоже можно
+Ну и после этого снова возвращаться к анализу ошибок на train/val/test датасетах.
 
-### О демонстрации
+
+![classifier_quality](resources/classifier_quality.png)
+
+
+### Маленькое отступление про демонстрацию
 
 Формат демонстрации зависит от того, кто целевая аудитория. Клиенту нужно одно, коллегам второе, журналу для публикации — третье. В целом, Tensorboard себя неплохо зарекомендовал и я бы делал его отправной точной для всего остального.
 
+Посмотреть тензорборды (только скаляры, без изображений):
+1. [Автоэнкодер](https://tensorboard.dev/experiment/2g68w3ZOSnOVrFADLro6Jw/#scalars&runSelectionState=eyJGZWIwNl8wMS0xNS0zOF9ob2x5YXJyYXkubG9jYWwiOnRydWV9)
+2. [Классификатор](https://tensorboard.dev/experiment/4GDmSG9yQIKPL7jx66RVvg/#scalars&runSelectionState=eyJydW5fMTY3NTY0NjczMy9BY2N1cmFjeV90cmFpbiBhY2N1cmFjeSI6ZmFsc2UsInJ1bl8xNjc1NjQ2NzMzL0FjY3VyYWN5X3ZhbCBhY2N1cmFjeSI6ZmFsc2UsInJ1bl8xNjc1NjQ2NzMzL0xvc3NfdHJhaW4gbG9zcyI6ZmFsc2UsInJ1bl8xNjc1NjQ2NzMzL0xvc3NfdmFsIGxvc3MiOmZhbHNlLCJydW5fMTY3NTY0ODA2Ny9BY2N1cmFjeV90cmFpbiBhY2N1cmFjeSI6ZmFsc2UsInJ1bl8xNjc1NjQ4MDY3L0FjY3VyYWN5X3ZhbCBhY2N1cmFjeSI6ZmFsc2UsInJ1bl8xNjc1NjQ4MDY3L0xvc3NfdHJhaW4gbG9zcyI6ZmFsc2UsInJ1bl8xNjc1NjQ4MDY3L0xvc3NfdmFsIGxvc3MiOmZhbHNlLCJydW5fMTY3NTY0ODI1Ny9BY2N1cmFjeV90ZXN0IGFjY3VyYWN5Ijp0cnVlLCJydW5fMTY3NTY0ODI1Ny9BY2N1cmFjeV90cmFpbiBhY2N1cmFjeSI6dHJ1ZSwicnVuXzE2NzU2NDgyNTcvQWNjdXJhY3lfdmFsIGFjY3VyYWN5Ijp0cnVlLCJydW5fMTY3NTY0ODI1Ny9Mb3NzX3RyYWluIGxvc3MiOnRydWUsInJ1bl8xNjc1NjQ4MjU3L0xvc3NfdmFsIGxvc3MiOnRydWV9)
+
+
+(К сожалению, гугл загрузку изображений туда не поддерживает. Я сохранил полный лог в репозиторий, на всякий случай).
 
 ## Технические детали
 
+Модельки из тетрадок переупакованы в src.models.autoencoder.py & classifier.py. Они там сразу инициализируются и, в принципе, подготовлены для запуска в продакшен (забудем на минутку, что при текущей модели точнее будет наугад категорию называть). 
+
 ### Установка
+
+Чтобы все точно работало, нужно установить этот репозиторий как пакет:
 ```
 python -m venv venv
 . venv/bin/activate
@@ -118,7 +126,7 @@ pip install -e .
 
 * notebooks → тетрадки с экспериментами
 
-	* notebooks/runs → сырые логи экспериментов (обычно в .gitignore, но это тестовое)
+	* notebooks/runs* → сырые логи экспериментов (обычно в .gitignore, но это тестовое)
 
 * resources → картинки для readme.md
 
